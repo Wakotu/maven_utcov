@@ -2,12 +2,18 @@
 
 ## Usage
 
+clone repository in project root:
+
+```bash
+git clone git@github.com:Wakotu/maven_utcov.git scripts
+```
+
 python environment setup
 
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r scripts/requirements.txt
 ```
 
 collecting coverage:
