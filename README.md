@@ -13,7 +13,7 @@ python environment setup
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r scripts/requirements.txt
+cat scripts/requirements.txt | xargs -n 1 pip install
 ```
 
 collecting coverage:
