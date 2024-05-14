@@ -7,6 +7,8 @@ import re
 import sys
 from dataclasses import dataclass
 
+from config import PROJECT_PREFIX
+
 # TODO:  remove project un-related call entries
 # TODO: move settings to config file and read from that file
 
@@ -43,7 +45,6 @@ class CallEnry:
 BASE_DIR = os.path.join(sys.path[0], "..")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 CALL_LOG = os.path.join(LOG_DIR, "test_source_call.log")
-PROJECT_PREFIX = "org.apache.commons.lang3"
 
 test_method_call_mapping: dict[Method, list[Method]] = {}
 

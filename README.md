@@ -29,3 +29,9 @@ Generating call chain:
 ./scripts/get_callgraph.sh
 python scripts/extract_callgraph.py
 ```
+
+customize the value for `PROJECT_PREFIX`:
+
+```python
+PROJECT_PREFIX = "org.apache.commons.lang3"
+```
