@@ -23,7 +23,7 @@ python scripts/get_test_methods.py
 python scripts/run_cov.py
 ```
 
-Generating call chain:
+### Generating call chain
 
 ```bash
 ./scripts/get_callgraph.sh
