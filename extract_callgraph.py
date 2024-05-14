@@ -7,6 +7,9 @@ import re
 import sys
 from dataclasses import dataclass
 
+# TODO:  remove project un-related call entries
+# TODO: move settings to config file and read from that file
+
 
 @dataclass
 class Method:
@@ -40,6 +43,7 @@ class CallEnry:
 BASE_DIR = os.path.join(sys.path[0], "..")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 CALL_LOG = os.path.join(LOG_DIR, "test_source_call.log")
+PROJECT_PREFIX = "org.apache.commons.lang3"
 
 test_method_call_mapping: dict[Method, list[Method]] = {}
 
@@ -103,9 +107,11 @@ def construct_method_call_mapping(call_log: str) -> dict[Method, list[Method]]:
             if record is None:
                 continue
             if record.caller not in method_call_mapping:
-                method_call_mapping[record.caller] = []
-            method_call_mapping[record.caller].append(record.callee)
+                method_call_mapping[record.caller] = set()
 
+            method_call_mapping[record.caller].add(record.callee)
+    for key, val in method_call_mapping.items():
+        method_call_mapping[key] = list(val)
     return method_call_mapping
 
 
@@ -118,6 +124,7 @@ def traverse_ut_call_tree(
     if root not in test_method_call_mapping:
         return
     for callee in test_method_call_mapping[root]:
+
         # judge if callee in entreis
         flag = False
         for entry in entries:
@@ -126,17 +133,19 @@ def traverse_ut_call_tree(
                 break
         if flag:
             continue
+        if not callee.class_name.startswith(PROJECT_PREFIX):
+            continue
         entries.append(CallEnry(callee, depth))
         traverse_ut_call_tree(callee, test_method_call_mapping, depth + 1, entries)
 
 
 def construct_ut_call_tree(
     ut: Method,
-    tm_call_mapping: dict[Method, list[Method]],
+    method_call_mapping: dict[Method, list[Method]],
     call_entries: dict[Method, list[CallEnry]],
 ):
     call_entries[ut] = []
-    traverse_ut_call_tree(ut, tm_call_mapping, 1, call_entries[ut])
+    traverse_ut_call_tree(ut, method_call_mapping, 1, call_entries[ut])
 
 
 def call_entries_pretty_persist(call_entries: dict[Method, list[CallEnry]]):
@@ -151,7 +160,7 @@ def call_entries_pretty_persist(call_entries: dict[Method, list[CallEnry]]):
 
 
 def construct_call_entry_mapping(
-    tm_call_mapping: dict[Method, list[Method]], unit_test_methods: list[Method]
+    method_call_mapping: dict[Method, list[Method]], unit_test_methods: list[Method]
 ) -> dict[Method, list[CallEnry]]:
     log_name = "call_entries.pickle"
     log_file = os.path.join(LOG_DIR, log_name)
@@ -161,7 +170,7 @@ def construct_call_entry_mapping(
 
     call_entries = {}
     for ut in unit_test_methods:
-        construct_ut_call_tree(ut, tm_call_mapping, call_entries)
+        construct_ut_call_tree(ut, method_call_mapping, call_entries)
     with open(log_file, "wb") as f:
         pickle.dump(call_entries, f)
 
@@ -170,9 +179,9 @@ def construct_call_entry_mapping(
 
 
 def get_call_chains():
-    tm_call_mapping = construct_method_call_mapping(CALL_LOG)
-    unit_tests = collect_unit_test_method(tm_call_mapping)
-    call_entries = construct_call_entry_mapping(tm_call_mapping, unit_tests)
+    method_call_mapping = construct_method_call_mapping(CALL_LOG)
+    unit_tests = collect_unit_test_method(method_call_mapping)
+    call_entries = construct_call_entry_mapping(method_call_mapping, unit_tests)
 
 
 def parse_args():
