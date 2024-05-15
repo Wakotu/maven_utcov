@@ -4,10 +4,9 @@ import json
 import os
 import pickle
 import re
-import sys
 from dataclasses import dataclass
 
-from config import PROJECT_PREFIX
+from config import BASE_DIR, CALL_LOG, LOG_DIR, PROJECT_PREFIX
 
 # TODO:  remove project un-related call entries
 # TODO: move settings to config file and read from that file
@@ -41,10 +40,6 @@ class CallEnry:
     callee: Method
     level: int
 
-
-BASE_DIR = os.path.join(sys.path[0], "..")
-LOG_DIR = os.path.join(BASE_DIR, "logs")
-CALL_LOG = os.path.join(LOG_DIR, "test_source_call.log")
 
 test_method_call_mapping: dict[Method, list[Method]] = {}
 
