@@ -12,7 +12,6 @@ prompt-toolkit==3.0.43
 ptyprocess==0.7.0
 pure-eval==0.2.2
 Pygments==2.18.0
-readline==6.2.4.1
 six==1.16.0
 stack-data==0.6.3
 traitlets==5.14.3
