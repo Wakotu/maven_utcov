@@ -43,7 +43,7 @@ def concatenate(log_list: list[str]):
     run_single_cmd(f"cat {log_list_str} >{CALL_LOG}")
 
 
-def run_generation():
+def run_generation() -> bool:
     compiled_jars = collect_compiled_jars()
     if len(compiled_jars) == 0:
         run_single_cmd("mvn package -Drat.skip=true")
@@ -56,7 +56,10 @@ def run_generation():
             continue
         log_list.append(dest_log)
 
+    if len(log_list) == 0:
+        return False
     concatenate(log_list)
+    return True
 
 
 def find_project_property_element(
@@ -92,9 +95,9 @@ def prepare_dirs():
     prepare_dir(TARGET_DIR)
 
 
-def main():
+def main() -> bool:
     prepare_dirs()
-    run_generation()
+    return run_generation()
 
 
 if __name__ == "__main__":
