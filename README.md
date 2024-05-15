@@ -30,6 +30,9 @@ python scripts/run_cov.py
 python scripts/extract_callgraph.py
 ```
 
+> [!NOTE]
+> `./scripts/get_callgraph.sh` needs the `test-jar` goal specified in the package lifecycle. Please refer to [create_test_jar](https://maven.apache.org/plugins/maven-jar-plugin/examples/create-test-jar.html)  
+
 customize the value for `PROJECT_PREFIX`:
 
 ```python
