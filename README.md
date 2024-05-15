@@ -26,7 +26,7 @@ python scripts/run_cov.py
 ### Generating call chain
 
 ```bash
-./scripts/get_callgraph.sh
+python scripts/gen_callgraph.py
 python scripts/extract_callgraph.py
 ```
 
