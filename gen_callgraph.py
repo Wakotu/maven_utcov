@@ -44,7 +44,6 @@ def concatenate(log_list: list[str]):
 
 
 def run_generation():
-    __import__("ipdb").set_trace()
     compiled_jars = collect_compiled_jars()
     if len(compiled_jars) == 0:
         run_single_cmd("mvn package -Drat.skip=true")
