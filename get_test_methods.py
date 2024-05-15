@@ -5,6 +5,8 @@ import re
 import subprocess
 import xml.etree.ElementTree as ET
 
+from config import TEST_METHODS_FILE
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 """
@@ -66,7 +68,7 @@ def get_all_report_dirs() -> list[str]:
 
 
 def persist(test_methods: list[str]):
-    filename = "data/test_methods.json"
+    filename = TEST_METHODS_FILE
     dir = os.path.dirname(filename)
     if not os.path.exists(dir):
         os.mkdir(dir)
@@ -104,7 +106,7 @@ def run_cmd(cmd: str):
 # TODO: run papare mvn commands
 def prepare_maven():
     run_cmd("mvn surefire-report:report -Drat.skip=true")
-    logging.info("run `mvn surefire-report:report` at first")
+    # logging.info("run `mvn surefire-report:report` at first")
 
 
 def parse_args():

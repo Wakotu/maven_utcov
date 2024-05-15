@@ -6,10 +6,11 @@ import pickle
 import re
 from dataclasses import dataclass
 
-from config import BASE_DIR, CALL_LOG, LOG_DIR, PROJECT_PREFIX
+from config import BASE_DIR, CALL_ENTRY_JSON, CALL_ENTRY_PICKLE, CALL_LOG, LOG_DIR
 
-# TODO:  remove project un-related call entries
-# TODO: move settings to config file and read from that file
+# TODO: automatically extract package project_prefix
+
+package_project_prefix = ""
 
 
 @dataclass
@@ -129,7 +130,7 @@ def traverse_ut_call_tree(
                 break
         if flag:
             continue
-        if not callee.class_name.startswith(PROJECT_PREFIX):
+        if not callee.class_name.startswith(package_project_prefix):
             continue
         entries.append(CallEnry(callee, depth))
         traverse_ut_call_tree(callee, test_method_call_mapping, depth + 1, entries)
@@ -146,7 +147,7 @@ def construct_ut_call_tree(
 
 def call_entries_pretty_persist(call_entries: dict[Method, list[CallEnry]]):
     json_obj = {}
-    filename = os.path.join(LOG_DIR, "call_entries.json")
+    filename = CALL_ENTRY_JSON
     for key, val in call_entries.items():
         json_obj[str(key)] = [
             {"callee": str(entry.callee), "level": entry.level} for entry in val
@@ -158,7 +159,7 @@ def call_entries_pretty_persist(call_entries: dict[Method, list[CallEnry]]):
 def construct_call_entry_mapping(
     method_call_mapping: dict[Method, list[Method]], unit_test_methods: list[Method]
 ) -> dict[Method, list[CallEnry]]:
-    log_name = "call_entries.pickle"
+    log_name = CALL_ENTRY_PICKLE
     log_file = os.path.join(LOG_DIR, log_name)
     if os.path.exists(log_file):
         with open(log_file, "rb") as f:
@@ -174,9 +175,42 @@ def construct_call_entry_mapping(
     return call_entries
 
 
+def longest_common_prefix(strs: list[str]):
+    """
+    Find the longest common prefix string amongst an array of strings.
+
+    Parameters:
+    strs (list of str): The list of strings.
+
+    Returns:
+    str: The longest common prefix.
+    """
+    if not strs:
+        return ""
+
+    # Start with the first string in the list as the prefix
+    prefix = strs[0]
+
+    for string in strs[1:]:
+        # Compare the prefix with each string and update the prefix
+        while string[: len(prefix)] != prefix and prefix != "":
+            prefix = prefix[: len(prefix) - 1]
+
+    return prefix
+
+
+def extract_project_prefix(uts: list[Method]) -> str:
+    """
+    get the longest common prefix
+    """
+    return longest_common_prefix([ut.class_name for ut in uts])
+
+
 def get_call_chains():
     method_call_mapping = construct_method_call_mapping(CALL_LOG)
     unit_tests = collect_unit_test_method(method_call_mapping)
+    global package_project_prefix
+    package_project_prefix = extract_project_prefix(unit_tests)
     call_entries = construct_call_entry_mapping(method_call_mapping, unit_tests)
 
 
@@ -192,6 +226,9 @@ def parse_args():
     try_mode = args.try_mode
 
 
-if __name__ == "__main__":
-    parse_args()
+def main():
     get_call_chains()
+
+
+if __name__ == "__main__":
+    main()

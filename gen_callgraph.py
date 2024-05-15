@@ -21,7 +21,9 @@ def collect_compiled_jars() -> list[str]:
                     # add in pair
                     res.append(os.path.join(root, file))
                     source_jar_name = file.replace(pat, ".jar")
-                    res.append(os.path.join(root, source_jar_name))
+                    source_jar_path = os.path.join(root, source_jar_name)
+                    if os.path.exists(source_jar_path):
+                        res.append(source_jar_path)
     return res
 
 
@@ -92,6 +94,7 @@ def prepare_dirs():
 
 
 def main():
+    prepare_dirs()
     run_generation()
 
 
