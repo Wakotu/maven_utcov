@@ -46,7 +46,7 @@ def concatenate(log_list: list[str]):
 def run_generation() -> bool:
     compiled_jars = collect_compiled_jars()
     if len(compiled_jars) == 0:
-        run_single_cmd("mvn package -Drat.skip=true")
+        run_single_cmd("mvn package -Drat.skip=true -Dmaven.test.failure.ignore=true")
         compiled_jars = collect_compiled_jars()
 
     log_list = []
